@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { motion } from "framer-motion";
 
 import { InputGroup } from "../InputGroup";
 import {
@@ -12,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { motion } from "framer-motion";
 import { SocialSeparator } from "../SocialSeparator";
 import { GoogleButton } from "../GoogleButton";
 import { Label } from "@/components/ui/label";
@@ -38,7 +40,6 @@ export default function RegisterForm() {
       const password = formData.get("password");
       const confirmPassword = formData.get("confirmPassword");
 
-      // Validation
       if (!fname || !lname || !email || !password || !confirmPassword) {
         throw new Error("All fields are required");
       }
@@ -47,11 +48,6 @@ export default function RegisterForm() {
         throw new Error("Passwords do not match");
       }
 
-      if ((password as string).length < 8) {
-        throw new Error("Password must be at least 8 characters");
-      }
-
-      // Call the auth API with registration data
       const result = await signIn("credentials", {
         email: email as string,
         password: password as string,
@@ -61,32 +57,22 @@ export default function RegisterForm() {
         redirect: false,
       });
 
-      if (result?.error) {
-        throw new Error(result.error);
-      }
-
-      if (result?.ok) {
-        // Registration successful, redirect to dashboard
-        router.push("/dashboard");
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "An error occurred during registration",
-      );
-      console.error("Registration error:", err);
+      if (result?.error) throw new Error(result.error);
+      if (result?.ok) router.push("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "An error occurred during registration");
     } finally {
       setIsLoading(false);
     }
   }
+
   return (
-    <div>
+    <div className="w-full transition-colors duration-500">
       <div className="space-y-2 text-center lg:text-left">
-        <h1 className="text-3xl font-bold tracking-tight dark:text-slate-50">
+        <h1 className="text-3xl font-bold tracking-tight text-cyan-600 dark:text-cyan-400">
           Create Account
         </h1>
-        <p className="text-slate-500 dark:text-slate-400 text-sm">
+        <p className="text-muted-foreground text-sm">
           Join the next generation of workflow management.
         </p>
       </div>
@@ -115,91 +101,78 @@ export default function RegisterForm() {
           placeholder="name@company.com"
         />
 
-        {/* PASSWORDS */}
         <div className="grid grid-cols-2 gap-4">
           {/* Password */}
-          <div className="relative">
+          <div className="relative group">
             <InputGroup
               label="Password"
               id="reg-password"
               name="password"
-              placeholder="Password"
+              placeholder="••••••••"
               type={showPassword ? "text" : "password"}
             />
-
-            {/* here code changes */}
             <button
               type="button"
-              onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-3 top-8 z-20 text-slate-500 hover:text-cyan-500 transition"
-              aria-label="Toggle password visibility"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-8.5 p-1 rounded-md text-muted-foreground hover:text-cyan-500 hover:bg-muted transition-all"
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
 
           {/* Confirm Password */}
-          <div className="relative">
+          <div className="relative group">
             <InputGroup
               label="Confirm Password"
               id="confirm-password"
               name="confirmPassword"
-              placeholder="Confirm Password"
+              placeholder="••••••••"
               type={showConfirmPassword ? "text" : "password"}
             />
-
-            {/* here code changes */}
             <button
               type="button"
-              onClick={() => setShowConfirmPassword((prev) => !prev)}
-              className="absolute right-3 top-8 z-20 text-slate-500 hover:text-cyan-500 transition"
-              aria-label="Toggle confirm password visibility"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-8.5 p-1 rounded-md text-muted-foreground hover:text-cyan-500 hover:bg-muted transition-all"
             >
-              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
         </div>
 
-        {/* ROLE SELECTION */}
         <div className="space-y-2">
-          <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+          <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Select Your Role
           </Label>
           <Select
             value={selectedRole}
             onValueChange={(value: "user" | "solver") => setSelectedRole(value)}
           >
-            <SelectTrigger className="bg-transparent border-slate-300 dark:border-slate-700">
+            <SelectTrigger className="  bg-primary-foreground border-input hover:border-cyan-500/50 transition-colors">
               <SelectValue placeholder="Select your role" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="user">
-                <div className="space-y-0.5">
-                  <p className="font-medium"> User</p>
-                </div>
-              </SelectItem>
-
-              <SelectItem value="solver">
-                <div className="space-y-0.5">
-                  <p className="font-medium">Problem Solver</p>
-                </div>
-              </SelectItem>
+            <SelectContent className=" text-primary">
+              <SelectItem value="user">Standard User</SelectItem>
+              <SelectItem value="solver">Problem Solver</SelectItem>
             </SelectContent>
           </Select>
-          <p className="text-xs text-slate-400">
-            Admin accounts can only be assigned by administrators
+          <p className="text-[10px] text-muted-foreground/70 italic">
+            Admin accounts require manual verification.
           </p>
         </div>
 
-        {/* ERROR MESSAGE */}
         {error && (
-          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-            <p className="text-sm text-red-500">{error}</p>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-3 rounded-lg bg-destructive/10 border border-destructive/20"
+          >
+            <p className="text-sm text-destructive font-medium">{error}</p>
+          </motion.div>
         )}
 
         <SubmitButton text="Create Account" isLoading={isLoading} />
       </form>
+
       <SocialSeparator />
       <GoogleButton />
     </div>
@@ -219,39 +192,17 @@ function SubmitButton({
       disabled={isLoading}
       whileHover={
         !isLoading
-          ? {
-              scale: 1.01,
-              boxShadow: "0 0 15px rgba(34, 211, 238, 0.4)",
-            }
+          ? { scale: 1.01, boxShadow: "0 0 20px rgba(34, 211, 238, 0.3)" }
           : {}
       }
       whileTap={!isLoading ? { scale: 0.98 } : {}}
-      className="group relative w-full bg-cyan-500 hover:bg-cyan-400 dark:bg-cyan-400 dark:hover:bg-cyan-300 text-[#020617] font-bold py-3 rounded-lg shadow-lg shadow-cyan-500/10 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+      className="w-full bg-cyan-600 dark:bg-cyan-500 hover:bg-cyan-500 dark:hover:bg-cyan-400 text-white dark:text-[#020617] font-bold py-3 rounded-lg shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
     >
       <span className="flex items-center justify-center gap-2">
-        {isLoading && (
-          <svg
-            className="animate-spin h-5 w-5 text-[#020617]"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-        )}
-        {isLoading ? "Authenticating..." : text}
+        {isLoading ? (
+          <span className="h-5 w-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+        ) : null}
+        {isLoading ? "Processing..." : text}
       </span>
     </motion.button>
   );

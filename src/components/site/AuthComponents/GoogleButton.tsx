@@ -1,8 +1,29 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { signIn } from "next-auth/react";
+import { useState } from "react";
 
 export function GoogleButton() {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsLoading(true);
+      await signIn("google", {
+        redirect: true,
+        callbackUrl: "/",
+      });
+    } catch (error) {
+      console.error("Google sign-in error:", error);
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Button
+      onClick={handleGoogleSignIn}
+      disabled={isLoading}
       variant="outline"
       className="w-full p-5 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex gap-2"
     >
@@ -24,7 +45,7 @@ export function GoogleButton() {
           fill="#EA4335"
         />
       </svg>
-      Google
+      {isLoading ? "Signing in..." : "Google"}
     </Button>
   );
 }

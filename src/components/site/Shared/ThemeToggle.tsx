@@ -27,7 +27,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={handleThemeToggle}
-      className="fixed top-6 right-6 z-50 p-3 rounded-full bg-slate-200/50 dark:bg-slate-800/50 backdrop-blur-md border border-slate-300 dark:border-slate-700 hover:border-cyan-400 transition-colors"
+      className="    p-3 rounded-full bg-slate-200/50 dark:bg-slate-800/50 backdrop-blur-md border border-slate-300 dark:border-slate-700 hover:border-cyan-400 transition-colors"
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
