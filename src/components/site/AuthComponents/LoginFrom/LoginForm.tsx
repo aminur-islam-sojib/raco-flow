@@ -7,6 +7,7 @@ import { GoogleButton } from "../GoogleButton";
 import { InputGroup } from "../InputGroup";
 import { SocialSeparator } from "../SocialSeparator";
 import { Eye, EyeOff } from "lucide-react";
+import { signIn } from "next-auth/react";
 
 export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,6 +21,21 @@ export default function LoginForm() {
     const data = Object.fromEntries(formData);
 
     console.log("Logging in with:", data);
+
+    try {
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+      if (result?.status == 200) {
+        console.log("Login Successful!");
+      } else if (result?.status == 401) {
+        console.log(`${result?.error}`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
 
     // Simulate API delay
     setTimeout(() => setIsLoading(false), 2000);

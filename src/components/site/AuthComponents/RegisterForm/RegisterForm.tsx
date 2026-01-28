@@ -1,11 +1,11 @@
 "use client";
 
-// here code changes
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 import { InputGroup } from "../InputGroup";
-
 import {
   Select,
   SelectContent,
@@ -19,21 +19,69 @@ import { GoogleButton } from "../GoogleButton";
 import { Label } from "@/components/ui/label";
 
 export default function RegisterForm() {
-  // here code changes
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<"user" | "solver">("user");
+
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
+    setError("");
 
-    const formData = new FormData(event.currentTarget);
-    const data = Object.fromEntries(formData);
+    try {
+      const formData = new FormData(event.currentTarget);
+      const fname = formData.get("fname");
+      const lname = formData.get("lname");
+      const email = formData.get("email");
+      const password = formData.get("password");
+      const confirmPassword = formData.get("confirmPassword");
 
-    console.log("Logging in with:", data);
+      // Validation
+      if (!fname || !lname || !email || !password || !confirmPassword) {
+        throw new Error("All fields are required");
+      }
 
-    // Simulate API delay
-    setTimeout(() => setIsLoading(false), 2000);
+      if (password !== confirmPassword) {
+        throw new Error("Passwords do not match");
+      }
+
+      if ((password as string).length < 8) {
+        throw new Error("Password must be at least 8 characters");
+      }
+
+      // Call the auth API with registration data
+      const result = await signIn("credentials", {
+        email: email as string,
+        password: password as string,
+        name: `${fname} ${lname}`,
+        role: selectedRole,
+        isRegister: "true",
+        redirect: false,
+      });
+
+      console.log("result", result);
+
+      if (result?.error) {
+        throw new Error(result.error);
+      }
+
+      if (result?.ok) {
+        // Registration successful, redirect to dashboard
+        router.push("/dashboard");
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred during registration",
+      );
+      console.error("Registration error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   }
   return (
     <div>
@@ -115,21 +163,43 @@ export default function RegisterForm() {
           </div>
         </div>
 
-        {/* ROLE */}
+        {/* ROLE SELECTION */}
         <div className="space-y-2">
           <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Role
+            Select Your Role
           </Label>
-          <Select>
+          <Select
+            value={selectedRole}
+            onValueChange={(value: "user" | "solver") => setSelectedRole(value)}
+          >
             <SelectTrigger className="bg-transparent border-slate-300 dark:border-slate-700">
-              <SelectValue placeholder="Select role" />
+              <SelectValue placeholder="Select your role" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="solver">Problem Solver</SelectItem>
-              <SelectItem value="user">User</SelectItem>
+              <SelectItem value="user">
+                <div className="space-y-0.5">
+                  <p className="font-medium"> User</p>
+                </div>
+              </SelectItem>
+
+              <SelectItem value="solver">
+                <div className="space-y-0.5">
+                  <p className="font-medium">Problem Solver</p>
+                </div>
+              </SelectItem>
             </SelectContent>
           </Select>
+          <p className="text-xs text-slate-400">
+            Admin accounts can only be assigned by administrators
+          </p>
         </div>
+
+        {/* ERROR MESSAGE */}
+        {error && (
+          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+            <p className="text-sm text-red-500">{error}</p>
+          </div>
+        )}
 
         <SubmitButton text="Create Account" isLoading={isLoading} />
         <SocialSeparator />
