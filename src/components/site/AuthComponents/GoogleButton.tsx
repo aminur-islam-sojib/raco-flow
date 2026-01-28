@@ -4,7 +4,7 @@ export function GoogleButton() {
   return (
     <Button
       variant="outline"
-      className="w-full border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex gap-2"
+      className="w-full p-5 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex gap-2"
     >
       <svg className="h-4 w-4" viewBox="0 0 24 24">
         <path

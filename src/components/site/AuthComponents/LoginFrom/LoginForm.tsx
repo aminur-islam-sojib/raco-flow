@@ -20,8 +20,6 @@ export default function LoginForm() {
     const formData = new FormData(event.currentTarget);
     const data = Object.fromEntries(formData);
 
-    console.log("Logging in with:", data);
-
     try {
       const result = await signIn("credentials", {
         email: data.email,
@@ -36,9 +34,6 @@ export default function LoginForm() {
     } catch (error) {
       console.log(error);
     }
-
-    // Simulate API delay
-    setTimeout(() => setIsLoading(false), 2000);
   }
 
   return (
@@ -97,11 +92,10 @@ export default function LoginForm() {
         </div>
 
         <SubmitButton text="Sign In" isLoading={isLoading} />
-
-        <SocialSeparator />
-
-        <GoogleButton />
       </form>
+
+      <SocialSeparator />
+      <GoogleButton />
     </div>
   );
 }

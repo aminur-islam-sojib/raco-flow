@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -61,8 +60,6 @@ export default function RegisterForm() {
         isRegister: "true",
         redirect: false,
       });
-
-      console.log("result", result);
 
       if (result?.error) {
         throw new Error(result.error);
@@ -202,9 +199,9 @@ export default function RegisterForm() {
         )}
 
         <SubmitButton text="Create Account" isLoading={isLoading} />
-        <SocialSeparator />
-        <GoogleButton />
       </form>
+      <SocialSeparator />
+      <GoogleButton />
     </div>
   );
 }
