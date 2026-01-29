@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Command } from "lucide-react";
+import { Search, Command, X } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -39,6 +39,19 @@ export default function AdminUsersPage() {
       (u.email || "").toLowerCase().includes(search.toLowerCase()),
   );
 
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
+
   return (
     // Uses 'bg-background' and 'text-foreground' for shadcn theme compatibility
     <div className="min-h-screen bg-background text-foreground p-4 md:p-8 selection:bg-primary/30 transition-colors duration-300">
@@ -71,13 +84,22 @@ export default function AdminUsersPage() {
             <Search className="w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           </div>
           <Input
+            ref={inputRef}
             placeholder="Search credentials..."
-            className="pl-10 bg-secondary/50 border-border backdrop-blur-xl focus-visible:ring-1 focus-visible:ring-primary/50 rounded-xl shadow-inner"
+            className="pl-10 pr-12 bg-secondary/50 border-border backdrop-blur-xl focus-visible:ring-2 focus-visible:ring-primary/50 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 placeholder:text-muted-foreground/50"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <div className="absolute inset-y-0 right-3 flex items-center">
-            <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+          <div className="absolute inset-y-0 right-3 flex items-center gap-2">
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                className="p-1 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors mr-1"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+            <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-50 group-hover:opacity-100 transition-opacity">
               <Command className="w-3 h-3" /> K
             </kbd>
           </div>

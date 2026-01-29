@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, UserPlus } from "lucide-react";
 
 import { User } from "./AdminUsersPage";
+import Swal from "sweetalert2";
 
 export function UserTableRow({
   user,
@@ -21,8 +22,34 @@ export function UserTableRow({
 
   const handlePromote = () => {
     if (!user.id) return;
-    startTransition(async () => {
-      await onPromote(user.id!);
+
+    Swal.fire({
+      title: "Promote User?",
+      text: `Are you sure you want to promote ${user.name || "this user"} to Buyer role?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, promote!",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#06b6d4", // cyan-500
+      cancelButtonColor: "#64748b", // slate-500
+      background: "#0f172a", // slate-900
+      color: "#f8fafc", // slate-50
+    }).then((result) => {
+      if (result.isConfirmed) {
+        startTransition(async () => {
+          await onPromote(user.id!);
+          Swal.fire({
+            title: "Promoted!",
+            text: "User has been promoted successfully.",
+            icon: "success",
+            background: "#0f172a",
+            color: "#f8fafc",
+            confirmButtonColor: "#06b6d4",
+            timer: 2000,
+            timerProgressBar: true,
+          });
+        });
+      }
     });
   };
 
