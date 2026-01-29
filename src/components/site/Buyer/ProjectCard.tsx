@@ -18,6 +18,7 @@ import {
   Users,
   Zap,
 } from "lucide-react";
+import Link from "next/link";
 
 export function ProjectCard({
   project,
@@ -120,14 +121,20 @@ export function ProjectCard({
 
       <div className="pt-4 border-t border-slate-800/50 flex gap-2">
         {project.status === "OPEN" && (
-          <Button className="flex-1 bg-cyan-500/10 hover:bg-cyan-500 hover:text-black text-cyan-400 border border-cyan-500/20 font-bold text-xs h-9">
+          <Link
+            href={`/buyer/projects/${project._id}/agents`}
+            className="flex-1 bg-cyan-500/10 hover:bg-cyan-500 hover:text-black text-cyan-400 border border-cyan-500/20 font-bold text-xs h-9 text-center flex items-center gap-2 justify-center rounded-md"
+          >
             <Users className="w-3.5 h-3.5 mr-2" /> VIEW AGENTS
-          </Button>
+          </Link>
         )}
         {project.status === "ASSIGNED" && (
-          <Button className="flex-1 bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-400 border border-amber-500/20 font-bold text-xs h-9">
+          <Link
+            href={`/buyer/projects/${project._id}/logs`}
+            className="flex-1 bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-400 border border-amber-500/20 font-bold text-xs h-9"
+          >
             <Zap className="w-3.5 h-3.5 mr-2" /> MISSION LOGS
-          </Button>
+          </Link>
         )}
         <Button
           variant="outline"

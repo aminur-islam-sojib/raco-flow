@@ -1,4 +1,5 @@
 import { collections, dbConnect } from "@/lib/dbConnects";
+import { ObjectId } from "mongodb";
 
 export async function createNewProject(data: any) {
   const projectsCollection = dbConnect(collections.PROJECTS);
@@ -40,4 +41,32 @@ export async function getAllProjects(filter = {}) {
     console.error("DATABASE_ERROR_FETCH_PROJECTS:", error);
     throw new Error("Failed to fetch projects from database");
   }
+}
+
+export async function getProjectWithApplicants(projectId: string) {
+  const projectsCollection = dbConnect(collections.PROJECTS);
+
+  // [Industry-Grade] Using Aggregation to join Project + Applicant Users
+  const projectData = await projectsCollection
+    .aggregate([
+      { $match: { _id: new ObjectId(projectId) } },
+      {
+        $lookup: {
+          from: "users", // Join with users collection
+          localField: "applicants", // The array of IDs in Project
+          foreignField: "_id", // The ID field in Users
+          as: "agentDetails", // Output array name
+        },
+      },
+      {
+        // Remove sensitive data like passwords from the joined user objects
+        $project: {
+          "agentDetails.password": 0,
+          "agentDetails.emailVerified": 0,
+        },
+      },
+    ])
+    .toArray();
+
+  return projectData[0] || null;
 }

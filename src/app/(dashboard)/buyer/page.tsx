@@ -12,7 +12,9 @@ export default async function BuyerPage() {
   }
 
   // Optional: Check role if needed
-  // if (session.user.role !== "buyer") { ... }
+  if (session.user.role !== "buyer") {
+    redirect("/auth/signin");
+  }
 
   const rawProjects = await getAllProjects({});
 
@@ -26,7 +28,7 @@ export default async function BuyerPage() {
   })) as Project[];
 
   // Filter for RBAC if needed (e.g. show only my projects? The request was "fetch all projects", assuming marketplace view or buyer's own projects.
-  // Context: "Buyer Dashboard". Usually buyers see their own projects.
+  // Context: "Buyer Dashboard". Usually buyers see their1 own projects.
   // But `getAllProjects({})` fetches everything. The mock data had "OPEN" and "ASSIGNED".
   // The user said "fetch all projects data from here and pass...".
   // I will pass all for now as requested.
