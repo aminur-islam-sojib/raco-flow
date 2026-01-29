@@ -12,3 +12,4 @@ export interface Project {
   createdAt: Date;
   updatedAt: Date;
 }
+export type ProjectStatus = "OPEN" | "ASSIGNED" | "COMPLETED";

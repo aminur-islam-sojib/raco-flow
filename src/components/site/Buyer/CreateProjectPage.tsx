@@ -34,7 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils"; // Standard Shadcn utility
+import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -124,14 +124,11 @@ export default function CreateProjectPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-100 p-6 lg:p-12">
+    <div className="min-h-screen bg-[#020617] text-slate-100">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
         {/* Left Side: Stepped Form */}
         <div className="lg:col-span-7">
           <header className="mb-8">
-            <h1 className="text-4xl font-bold tracking-tight bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-              Launch Project
-            </h1>
             <div className="flex items-center gap-4 mt-6">
               {STEPS.map((step, idx) => (
                 <div key={step} className="flex items-center gap-2">
