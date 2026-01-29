@@ -1,5 +1,5 @@
-import { AuthForm } from "@/components/site/AuthComponents/auth-form";
-import React from "react";
+"use client";
+import { AuthForm } from "@/components/site/Auth/auth-form";
 
 export default function page() {
   return <AuthForm />;
