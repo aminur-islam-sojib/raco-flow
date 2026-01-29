@@ -16,12 +16,6 @@ export async function createNewProject(data: any) {
   return { ...project, _id: result.insertedId };
 }
 
-export async function getMarketplaceProjects() {
-  const projectsCollection = dbConnect(collections.PROJECTS);
-
-  return await projectsCollection.find({}).toArray();
-}
-
 /**
  * Fetches all projects with optional filtering by status or role.
  * @param filter - MongoDB query object (e.g., { status: "OPEN" })
@@ -69,4 +63,46 @@ export async function getProjectWithApplicants(projectId: string) {
     .toArray();
 
   return projectData[0] || null;
+}
+
+export async function getMarketplaceProjects() {
+  const projectsCollection = dbConnect(collections.PROJECTS);
+
+  // Fetch projects that are OPEN
+  // We use .project() to only send what the Solver needs to see
+  return await projectsCollection
+    .find({ status: "OPEN" })
+    .project({
+      title: 1,
+      description: 1,
+      budget: 1,
+      deadline: 1,
+      category: 1,
+      buyerId: 1,
+      applicantCount: { $size: "$applicants" },
+    })
+    .sort({ createdAt: -1 })
+    .toArray();
+}
+
+export async function getPaginatedMarketplace(page: number, limit: number) {
+  const projectsCollection = dbConnect(collections.PROJECTS);
+  const skip = (page - 1) * limit;
+
+  // Run two queries in parallel for better performance
+  const [projects, total] = await Promise.all([
+    projectsCollection
+      .find({ status: "OPEN" })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .toArray(),
+    projectsCollection.countDocuments({ status: "OPEN" }),
+  ]);
+
+  return {
+    projects,
+    totalPages: Math.ceil(total / limit),
+    totalCount: total,
+  };
 }

@@ -11,6 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Swal from "sweetalert2";
 import { signOut } from "next-auth/react";
+import { ThemeToggle } from "./ThemeToggle";
 export function UserMenu({ user, role }: { user: any; role: string }) {
   const handleLogoutButton = () => {
     Swal.fire({
@@ -60,6 +61,9 @@ export function UserMenu({ user, role }: { user: any; role: string }) {
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogoutButton} className="text-red-500">
           <LogOut className="mr-2 h-4 w-4" /> Logout
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <ThemeToggle />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
