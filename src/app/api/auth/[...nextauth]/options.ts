@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { type NextAuthOptions } from "next-auth";
@@ -108,13 +109,20 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     // ============ JWT CALLBACK ============
     // Sync user data with DB and add role to token
-    async jwt({
-      token,
-    }: {
-      token: JWT;
-      user?: User | undefined;
-      account?: Account | null | undefined;
-    }) {
+    async jwt({ token, user }: { token: JWT; user?: User | undefined }) {
+      // On initial sign in, `user` will be populated (credentials or OAuth).
+      // Make sure role/id/email from the returned user object are written to the token.
+      if (user) {
+        token.id = (user as any).id || (user as any)._id || token.id || "";
+        token.role = (user as any).role as unknown as string;
+        token.name = token.name || (user as any).name;
+        token.email = token.email || (user as any).email;
+        token.image = token.image || (user as any).image;
+        return token;
+      }
+
+      // Subsequent requests will have only the token. If it contains an email,
+      // refresh token fields from the DB to keep roles in sync.
       if (!token.email) return token;
 
       const dbUser = await findUserByEmail(token.email);
@@ -125,10 +133,10 @@ export const authOptions: NextAuthOptions = {
         return token;
       }
 
-      token.id = dbUser._id?.toString() || "";
+      token.id = dbUser._id?.toString() || token.id || "";
       token.role = dbUser.role;
-      token.name = dbUser.name;
-      token.image = dbUser.image;
+      token.name = dbUser.name || token.name;
+      token.image = dbUser.image || token.image;
 
       return token;
     },

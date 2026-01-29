@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { collections, dbConnect } from "./dbConnects";
 import bcrypt from "bcryptjs";
 
-export type UserRole = "user" | "admin" | "buyer" | "solver";
+export type UserRole = "user" | "admin" | "buyer" | "solver" | "guest";
 
 export interface User {
   _id?: ObjectId;

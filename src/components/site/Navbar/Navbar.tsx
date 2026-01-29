@@ -12,11 +12,11 @@ import {
 } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ROLE_LINKS } from "@/components/Types/nav";
 import { UserRole } from "@/lib/user.service";
 import { ThemeToggle } from "../Shared/ThemeToggle";
 import { UserMenu } from "../Shared/UserMenu";
 import { MobileMenu } from "./MobileMenu";
+import { NAV_CONFIG } from "@/config/nav.config";
 
 export function Navbar() {
   const { data: session, status } = useSession();
@@ -26,21 +26,21 @@ export function Navbar() {
 
   // Scroll Animations: Shrink and darken on scroll
   const navScale = useTransform(scrollY, [0, 100], [1, 0.98]);
-  const navBg = useTransform(
-    scrollY,
-    [0, 100],
-    ["rgba(255, 255, 255, 0)", "var(--nav-bg-scroll)"],
-  );
+  const navOpacity = useTransform(scrollY, [0, 100], [0, 1]);
 
-  const role = (session?.user?.role as UserRole) || "guest";
-  const navItems = ROLE_LINKS[role];
+  const role = (session?.user?.role as UserRole) || "user";
+  const navItems = NAV_CONFIG[role] || NAV_CONFIG.user || [];
 
   return (
     <motion.header
-      style={{ scale: navScale, backgroundColor: navBg }}
-      className="fixed top-4 inset-x-0 mx-auto z-50 w-[95%] max-w-7xl rounded-full border border-white/10 backdrop-blur-md transition-all duration-300"
+      style={{ scale: navScale }}
+      className="fixed top-4 inset-x-0 mx-auto z-50 w-[95%] max-w-7xl rounded-full border border-white/10 backdrop-blur-md transition-all duration-300 pointer-events-none"
     >
-      <div className="px-6 h-16 flex items-center justify-between">
+      <motion.div
+        style={{ opacity: navOpacity }}
+        className="absolute inset-0 bg-[var(--nav-bg-scroll)] rounded-full -z-10"
+      />
+      <div className="px-6 h-16 flex items-center justify-between pointer-events-auto relative z-10">
         {/* Logo with Shimmer */}
         <Link href="/" className="relative group flex items-center gap-2">
           <div className="w-8 h-8 bg-cyan-500 rounded-lg rotate-45 group-hover:rotate-90 transition-transform duration-500" />

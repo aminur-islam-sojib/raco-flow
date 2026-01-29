@@ -40,7 +40,7 @@ export default function LoginForm() {
     <div className="w-full">
       {/* Header Section */}
       <div className="space-y-2 text-center lg:text-left mb-8">
-        <h1 className="text-3xl font-bold tracking-tight dark:text-slate-50">
+        <h1 className="text-3xl font-bold tracking-tight text-cyan-500">
           Welcome Back
         </h1>
         <p className="text-slate-500 dark:text-slate-400 text-sm">
