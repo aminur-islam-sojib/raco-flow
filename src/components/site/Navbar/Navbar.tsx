@@ -100,7 +100,6 @@ export function Navbar() {
           >
             {isOpen ? <X /> : <Menu />}
           </button>
-          <ThemeToggle />
         </div>
       </div>
 

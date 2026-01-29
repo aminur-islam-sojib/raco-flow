@@ -70,7 +70,7 @@ export default function AdminUsersPage() {
       {/* Header Section */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
         <div>
-          <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-br from-foreground to-foreground/50 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold tracking-tighter bg-linear-to-br from-foreground to-foreground/50 bg-clip-text text-transparent">
             User Directory
           </h1>
           <p className="text-muted-foreground mt-1 text-balance">
@@ -116,7 +116,7 @@ export default function AdminUsersPage() {
           <Table>
             <TableHeader className="bg-muted/50 uppercase text-[11px] tracking-widest">
               <TableRow className="hover:bg-transparent border-border">
-                <TableHead className="w-[280px] text-muted-foreground font-semibold py-4">
+                <TableHead className="w-70 text-muted-foreground font-semibold py-4">
                   Identity
                 </TableHead>
                 <TableHead className="text-muted-foreground font-semibold">
