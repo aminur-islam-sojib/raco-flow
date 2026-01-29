@@ -11,7 +11,7 @@ import confetti from "canvas-confetti";
 import { useRouter } from "next/navigation";
 import {
   Rocket,
-  Calendar,
+  Calendar as CalendarIconDate,
   DollarSign,
   ChevronRight,
   ChevronLeft,
@@ -33,6 +33,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils"; // Standard Shadcn utility
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar as CalendarIcon, Info } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useProjects } from "@/Hooks/useProjects";
 
@@ -80,8 +89,20 @@ export default function CreateProjectPage() {
         ? ["title", "description", "category"]
         : ["budget", "deadline"];
 
+    console.log("Attempting to validate fields:", fields);
+    console.log("Current form values:", formData);
+
     const isValid = await trigger(fields as any);
-    if (isValid) setCurrentStep((prev) => prev + 1);
+
+    console.log("Validation result:", isValid);
+    console.log("Form errors:", form.formState.errors);
+
+    if (isValid) {
+      console.log("Moving to next step");
+      setCurrentStep((prev) => prev + 1);
+    } else {
+      console.log("Validation failed, staying on current step");
+    }
   };
 
   const onSubmit = async (data: ProjectFormValues) => {
@@ -108,7 +129,7 @@ export default function CreateProjectPage() {
         {/* Left Side: Stepped Form */}
         <div className="lg:col-span-7">
           <header className="mb-8">
-            <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold tracking-tight bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
               Launch Project
             </h1>
             <div className="flex items-center gap-4 mt-6">
@@ -135,7 +156,7 @@ export default function CreateProjectPage() {
           </header>
 
           <Card className="relative p-8 bg-slate-900/40 backdrop-blur-3xl border-slate-800 overflow-hidden group">
-            <div className="absolute inset-0 p-px -z-10 rounded-2xl bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent group-hover:via-cyan-500/40 transition-all duration-500" />
+            <div className="absolute inset-0 p-px -z-10 rounded-2xl bg-linear-to-r from-transparent via-cyan-500/20 to-transparent group-hover:via-cyan-500/40 transition-all duration-500" />
 
             {errorMessage && (
               <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-3">
@@ -157,20 +178,30 @@ export default function CreateProjectPage() {
                   transition={{ duration: 0.3 }}
                 >
                   {currentStep === 0 && (
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-400">
+                    <div className="space-y-8">
+                      {/* Project Title - Modern Glow Input */}
+                      <div className="space-y-2 group">
+                        <label className="text-xs uppercase tracking-[0.2em] font-bold text-slate-500 group-focus-within:text-cyan-400 transition-colors">
                           Project Title
                         </label>
-                        <Input
-                          {...form.register("title")}
-                          placeholder="e.g. Next-Gen Neural Interface"
-                          className="bg-slate-950/50 border-slate-800 focus:border-cyan-500"
-                        />
+                        <div className="relative">
+                          <Input
+                            {...form.register("title")}
+                            placeholder="e.g. Next-Gen Neural Interface"
+                            className="h-12 bg-slate-950/40 border-slate-800/60 focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 placeholder:text-slate-600 transition-all duration-300 rounded-xl"
+                          />
+                        </div>
+                        {form.formState.errors.title && (
+                          <p className="text-xs text-red-400 mt-1">
+                            {form.formState.errors.title.message}
+                          </p>
+                        )}
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-400">
-                          Category
+
+                      {/* Category - Modern Select */}
+                      <div className="space-y-2 group">
+                        <label className="text-xs uppercase tracking-[0.2em] font-bold text-slate-500 group-focus-within:text-cyan-400 transition-colors">
+                          Category / Sector
                         </label>
                         <Select
                           onValueChange={(v) => {
@@ -178,62 +209,188 @@ export default function CreateProjectPage() {
                             form.trigger("category");
                           }}
                         >
-                          <SelectTrigger className="bg-slate-950/50 border-slate-800">
-                            <SelectValue placeholder="Select Sector" />
+                          <SelectTrigger className="h-12 bg-slate-950/40 border-slate-800/60 focus:ring-4 focus:ring-cyan-500/10 hover:bg-slate-900/60 transition-all rounded-xl border-dashed">
+                            <SelectValue placeholder="Identify Transmission Sector" />
                           </SelectTrigger>
-                          <SelectContent className="bg-slate-900 border-slate-800 text-slate-200">
-                            <SelectItem value="Development">
-                              Development
+                          <SelectContent className="bg-slate-950 border-slate-800 backdrop-blur-xl">
+                            <SelectItem
+                              value="Development"
+                              className="focus:bg-cyan-500/10 focus:text-cyan-400 cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+                                Full-Stack Development
+                              </div>
                             </SelectItem>
-                            <SelectItem value="AI/ML">
-                              AI / Machine Learning
+                            <SelectItem
+                              value="AI/ML"
+                              className="focus:bg-cyan-500/10 focus:text-cyan-400 cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.5)]" />
+                                AI / Machine Learning
+                              </div>
                             </SelectItem>
-                            <SelectItem value="Design">
-                              Visual Design
+                            <SelectItem
+                              value="Design"
+                              className="focus:bg-cyan-500/10 focus:text-cyan-400 cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-pink-500" />
+                                Visual Design
+                              </div>
                             </SelectItem>
                           </SelectContent>
                         </Select>
+                        {form.formState.errors.category && (
+                          <p className="text-xs text-red-400 mt-1">
+                            {form.formState.errors.category.message}
+                          </p>
+                        )}
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-400">
-                          Description
+
+                      {/* Description - Modern Glass Textarea */}
+                      <div className="space-y-2 group">
+                        <label className="text-xs uppercase tracking-[0.2em] font-bold text-slate-500 group-focus-within:text-cyan-400 transition-colors">
+                          Mission Description
                         </label>
-                        <Textarea
-                          {...form.register("description")}
-                          rows={5}
-                          placeholder="Describe the mission scope..."
-                          className="bg-slate-950/50 border-slate-800 focus:border-cyan-500"
-                        />
+                        <div className="relative rounded-xl overflow-hidden bg-slate-950/40 border border-slate-800/60 group-focus-within:border-cyan-500/50 transition-all duration-300">
+                          <Textarea
+                            {...form.register("description")}
+                            rows={6}
+                            placeholder="Describe the mission scope, technical requirements, and objectives..."
+                            className="bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none placeholder:text-slate-600 leading-relaxed p-4"
+                          />
+                          {/* Decorative Corner Accent */}
+                          <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-cyan-500/20 group-focus-within:border-cyan-500/60 transition-colors" />
+
+                          {/* Word counter placeholder (Optional UI addition) */}
+                          <div className="absolute bottom-2 right-4 text-[10px] font-mono text-slate-600 uppercase">
+                            Standard Stream
+                          </div>
+                        </div>
+                        {form.formState.errors.description && (
+                          <p className="text-xs text-red-400 mt-1">
+                            {form.formState.errors.description.message}
+                          </p>
+                        )}
                       </div>
                     </div>
                   )}
 
                   {currentStep === 1 && (
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-400">
-                          Budget (USD)
-                        </label>
-                        <div className="relative border-slate-800">
-                          <DollarSign className="absolute left-3 top-3 w-4 h-4 text-cyan-500" />
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                      {/* Budget Allocation - Precision Input */}
+                      <div className="space-y-3 group">
+                        <div className="flex justify-between items-center">
+                          <label className="text-xs uppercase tracking-[0.2em] font-bold text-slate-500 group-focus-within:text-cyan-400 transition-colors">
+                            Budget Allocation
+                          </label>
+                          <span className="text-[10px] font-mono text-cyan-500/50 uppercase">
+                            Currency: USD
+                          </span>
+                        </div>
+
+                        <div className="relative flex items-center">
+                          {/* Icon with subtle pulse on container focus */}
+                          <div className="absolute left-4 z-10 p-1.5 rounded-md bg-cyan-500/10 border border-cyan-500/20 group-focus-within:animate-pulse">
+                            <DollarSign className="w-4 h-4 text-cyan-500" />
+                          </div>
+
                           <Input
                             {...form.register("budget")}
                             type="number"
-                            className="pl-10 bg-slate-950/50 border-slate-800 focus:border-cyan-500"
+                            placeholder="0.00"
+                            className="h-14 pl-14 bg-slate-950/40 border-slate-800/60 focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all rounded-2xl font-mono text-lg text-cyan-50"
                           />
+
+                          {/* Visual background indicator for depth */}
+                          <div className="absolute right-4 pointer-events-none text-slate-700 font-bold group-focus-within:text-cyan-900/30 transition-colors">
+                            CREDITS
+                          </div>
                         </div>
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-400">
+
+                      {/* Target Deadline - Futuristic Date Picker Wrapper */}
+                      <div className="space-y-3 group">
+                        <label className="text-xs uppercase tracking-[0.2em] font-bold text-slate-500 group-focus-within:text-cyan-400 transition-colors">
                           Target Deadline
                         </label>
-                        <div className="relative">
-                          <Calendar className="absolute left-3 top-3 w-4 h-4 text-cyan-500" />
-                          <Input
-                            {...form.register("deadline")}
-                            type="date"
-                            className="pl-10 bg-slate-950/50 border-slate-800 focus:border-cyan-500 text-slate-200"
-                          />
+
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-full h-14 justify-start text-left font-normal transition-all rounded-2xl bg-slate-950/40 border-slate-800/60 hover:bg-slate-900/60 hover:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10",
+                                !formData.deadline && "text-slate-500",
+                              )}
+                            >
+                              <div className="absolute left-4 z-10 text-cyan-500/60 group-focus-within:text-cyan-400">
+                                <CalendarIcon className="w-5 h-5" />
+                              </div>
+
+                              <span className="pl-10 text-slate-200">
+                                {formData.deadline ? (
+                                  format(new Date(formData.deadline), "PPP")
+                                ) : (
+                                  <span>Pick a temporal node</span>
+                                )}
+                              </span>
+
+                              {/* Decorative Badge */}
+                              <div className="ml-auto px-2 py-1 rounded bg-slate-900/80 border border-slate-800 text-[10px] font-mono text-slate-500 uppercase">
+                                Open Chronos
+                              </div>
+                            </Button>
+                          </PopoverTrigger>
+
+                          <PopoverContent
+                            className="w-auto p-0 bg-slate-950 border-slate-800 shadow-[0_0_30px_rgba(0,0,0,0.5)] backdrop-blur-xl"
+                            align="start"
+                          >
+                            <Calendar
+                              mode="single"
+                              selected={
+                                formData.deadline
+                                  ? new Date(formData.deadline)
+                                  : undefined
+                              }
+                              onSelect={(date) => {
+                                // Setting the date as a string for your Zod schema
+                                form.setValue(
+                                  "deadline",
+                                  date ? date.toISOString() : "",
+                                );
+                                form.trigger("deadline");
+                              }}
+                              disabled={(date) =>
+                                date < new Date() ||
+                                date < new Date("1900-01-01")
+                              }
+                              initialFocus
+                              className="p-3 pointer-events-auto"
+                              classNames={{
+                                day_selected:
+                                  "bg-cyan-500 text-slate-950 hover:bg-cyan-400 hover:text-slate-900 focus:bg-cyan-500 focus:text-slate-950 rounded-md",
+                                day_today: "bg-slate-800 text-cyan-400",
+                                head_cell:
+                                  "text-slate-500 font-bold uppercase text-[10px] tracking-tighter",
+                                day: "text-slate-300 hover:bg-cyan-500/20 hover:text-cyan-400 rounded-md transition-all",
+                                nav_button:
+                                  "border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-cyan-400",
+                              }}
+                            />
+                          </PopoverContent>
+                        </Popover>
+
+                        {/* System Intelligence Helper */}
+                        <div className="flex items-center gap-2 px-1">
+                          <Info className="w-3 h-3 text-cyan-500/50" />
+                          <p className="text-[10px] text-slate-600 italic">
+                            Broadcast parameters will lock 24h prior to the
+                            selected node.
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -267,7 +424,11 @@ export default function CreateProjectPage() {
                         <ReviewItem
                           icon={<Clock className="w-4 h-4" />}
                           label="Deadline"
-                          value={formData.deadline}
+                          value={
+                            formData.deadline
+                              ? format(new Date(formData.deadline), "PPP")
+                              : "Not Set"
+                          }
                         />
                       </div>
 
@@ -306,13 +467,14 @@ export default function CreateProjectPage() {
                     onClick={nextStep}
                     className="bg-cyan-600 hover:bg-cyan-500 text-white px-8"
                   >
-                    Review Details <ChevronRight className="w-4 h-4 ml-2" />
+                    {currentStep === 0 ? "Continue" : "Review Details"}{" "}
+                    <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
                 ) : (
                   <Button
                     disabled={apiLoading}
                     type="submit"
-                    className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-12 font-bold shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                    className="bg-linear-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-12 font-bold shadow-[0_0_20px_rgba(6,182,212,0.3)]"
                   >
                     {apiLoading ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -333,7 +495,7 @@ export default function CreateProjectPage() {
           </div>
           <motion.div
             layout
-            className="rounded-2xl border border-white/5 bg-gradient-to-b from-white/5 to-transparent p-6 shadow-2xl backdrop-blur-sm"
+            className="rounded-2xl border border-white/5 bg-linear-to-b from-white/5 to-transparent p-6 shadow-2xl backdrop-blur-sm"
           >
             {/* Same preview logic as before */}
             <div className="flex justify-between items-start mb-6">
@@ -362,7 +524,9 @@ export default function CreateProjectPage() {
                   Deadline
                 </div>
                 <div className="text-sm font-mono text-slate-200">
-                  {formData.deadline || "TBD"}
+                  {formData.deadline
+                    ? format(new Date(formData.deadline), "PPP")
+                    : "TBD"}
                 </div>
               </div>
               <div className="text-sm font-mono text-emerald-400 flex items-center gap-1 uppercase">
@@ -417,13 +581,13 @@ function ReviewItem({
   value: string | number | null;
 }) {
   return (
-    <div className="flex items-start gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
+    <div className="flex items-start gap-3 p-3 rounded-lg bg-white/3 border border-white/5">
       <div className="text-cyan-500 mt-1">{icon}</div>
       <div>
         <div className="text-[10px] uppercase font-bold text-slate-500">
           {label}
         </div>
-        <div className="text-sm font-medium text-slate-200 truncate max-w-[150px]">
+        <div className="text-sm font-medium text-slate-200 truncate max-w-37.5">
           {value || "Not Set"}
         </div>
       </div>

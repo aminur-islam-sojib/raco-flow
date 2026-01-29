@@ -15,9 +15,26 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
+    console.log("Received project data:", body);
+
     const { title, description, budget, deadline, category } = body;
 
-    if (!title || !description || !budget || !deadline || !category) {
+    // Validate required fields (budget can be 0, so check for null/undefined)
+    if (
+      !title ||
+      !description ||
+      budget === null ||
+      budget === undefined ||
+      !deadline ||
+      !category
+    ) {
+      console.log("Validation failed:", {
+        hasTitle: !!title,
+        hasDescription: !!description,
+        hasBudget: budget !== null && budget !== undefined,
+        hasDeadline: !!deadline,
+        hasCategory: !!category,
+      });
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 },
