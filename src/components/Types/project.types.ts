@@ -13,4 +13,25 @@ export interface Project {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface AgentDetail {
+  _id: string;
+  name?: string;
+  email: string;
+  image?: string;
+  role: "user" | "admin" | "buyer" | "solver" | "guest";
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProjectWithApplicants extends Project {
+  agentDetails: AgentDetail[];
+}
+
+// Client-serializable version (ensure all ObjectId/Date are strings)
+export interface ProjectWithApplicantsClient extends Project {
+  agentDetails: AgentDetail[];
+}
+
 export type ProjectStatus = "OPEN" | "ASSIGNED" | "COMPLETED";

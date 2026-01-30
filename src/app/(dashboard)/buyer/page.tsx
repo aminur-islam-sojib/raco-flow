@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import ProjectList, { Project } from "@/components/site/Buyer/ProjectList";
 import { getAllProjects } from "@/services/projectService";
 import { getServerSession } from "next-auth";
@@ -26,7 +27,7 @@ export default async function BuyerPage() {
     _id: p._id.toString(),
     deadline: new Date(p.deadline).toISOString(),
   })) as Project[];
-
+  console.log(projects);
   // Filter for RBAC if needed (e.g. show only my projects? The request was "fetch all projects", assuming marketplace view or buyer's own projects.
   // Context: "Buyer Dashboard". Usually buyers see their1 own projects.
   // But `getAllProjects({})` fetches everything. The mock data had "OPEN" and "ASSIGNED".

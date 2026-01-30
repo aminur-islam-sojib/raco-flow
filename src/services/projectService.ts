@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { collections, dbConnect } from "@/lib/dbConnects";
 import { ObjectId } from "mongodb";
 
@@ -105,4 +106,57 @@ export async function getPaginatedMarketplace(page: number, limit: number) {
     totalPages: Math.ceil(total / limit),
     totalCount: total,
   };
+}
+
+/**
+ * Requirement: View incoming requests from problem solvers [cite: 25]
+ * This function joins project data with applicant user details.
+ */
+export async function getProjectApplicants(projectId: string) {
+  try {
+    const projectCol = dbConnect(collections.PROJECTS);
+
+    const pipeline = [
+      // 1. Match the specific project by ID
+      { $match: { _id: new ObjectId(projectId) } },
+
+      // 2. Convert string IDs in applicants array to ObjectIds for lookup
+      {
+        $addFields: {
+          applicantIds: {
+            $map: {
+              input: "$applicants",
+              as: "id",
+              in: { $toObjectId: "$$id" },
+            },
+          },
+        },
+      },
+
+      // 3. Join with Users collection to get full details [cite: 87, 88]
+      {
+        $lookup: {
+          from: collections.USERS,
+          localField: "applicantIds",
+          foreignField: "_id",
+          as: "agentDetails",
+        },
+      },
+
+      // 4. Security: Remove passwords and internal fields
+      {
+        $project: {
+          applicantIds: 0,
+          "agentDetails.password": 0,
+          "agentDetails.emailVerified": 0,
+        },
+      },
+    ];
+
+    const result = await projectCol.aggregate(pipeline).toArray();
+    return result[0] || null;
+  } catch (error) {
+    console.error("Error fetching applicants:", error);
+    throw error;
+  }
 }

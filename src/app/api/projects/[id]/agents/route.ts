@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
+import { getProjectApplicants } from "@/services/projectService";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import { getProjectWithApplicants } from "@/services/projectService";
 
 export async function GET(
   req: Request,
@@ -12,35 +12,31 @@ export async function GET(
     if (!session)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const project = await getProjectWithApplicants(params.id);
+    const projectWithAgents = await getProjectApplicants(params.id);
 
-    if (!project) {
+    if (!projectWithAgents) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
     if (!session || !session.user || session.user.role !== "buyer") {
       return NextResponse.json(
-        { error: "Only Buyers can post projects" },
+        { error: "Only Buyers can view projects" },
         { status: 403 },
       );
     }
-    // Security: Only the Buyer who created the project (or Admin) can see applicants
-    if (session.user.role !== "admin" && project.buyerId !== session.user.id) {
-      return NextResponse.json({ error: "Access Denied" }, { status: 403 });
+    // Security: Only the Buyer who created this can see the applicants
+    if (
+      projectWithAgents.buyerId !== session.user.id &&
+      session.user.role !== "admin"
+    ) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     return NextResponse.json({
       success: true,
-      data: {
-        title: project.title,
-        budget: project.budget,
-        status: project.status,
-        applicants: project.agentDetails,
-      },
+      data: projectWithAgents,
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 },
-    );
+    console.error("FETCH_APPLICANTS_ERROR:", error);
+    return NextResponse.json({ error: "Server Error" }, { status: 500 });
   }
 }

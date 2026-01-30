@@ -1,60 +1,77 @@
-import { getProjectWithApplicants } from "@/services/projectService";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import { redirect } from "next/navigation";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// app/projects/[project_id]/agents/page.tsx
 
-interface PageProps {
-  params: Promise<{
+import ProjectApplicantsPage from "@/components/site/Buyer/AgentConfirmation/AgentDashboard";
+import { getProjectApplicants } from "@/services/projectService";
+import { ProjectWithApplicantsClient } from "@/components/Types/project.types";
+
+type PageProps = {
+  params: {
     project_id: string;
-  }>;
-}
+  };
+};
 
-export default async function Page({ params }: PageProps) {
+export default async function AgentsPage({ params }: PageProps) {
   const { project_id } = await params;
-  const session = await getServerSession(authOptions);
+  console.log("Project ID:", project_id);
 
-  if (!session || !session.user) {
-    redirect("/api/auth/signin");
+  if (!project_id) {
+    return;
   }
 
-  // Fetch data directly from the service
-  const project = await getProjectWithApplicants(project_id);
+  const raw = await getProjectApplicants(project_id);
+  console.log("Project data fetched:", raw);
 
-  if (!project) {
-    return <div>Project not found</div>;
-  }
+  // Serialize the result into plain JS (convert ObjectId/Date to strings)
+  const serialize = (input: any): ProjectWithApplicantsClient | null => {
+    if (!input) return null;
 
-  // Security check: Only the buyer (or admin) can see applicants
-  if (session.user.role !== "admin" && project.buyerId !== session.user.id) {
-    return <div>Access Denied</div>;
-  }
+    const toIdString = (v: any) => {
+      if (v == null) return "";
+      // Mongo ObjectId has toHexString
+      if (typeof v === "object") {
+        if (typeof v.toHexString === "function") return v.toHexString();
+        if (typeof v.toString === "function") {
+          const s = v.toString();
+          // strip ObjectId("...") wrapper if present
+          const m = s.match(/ObjectId\("?([a-fA-F0-9]{24})"?\)/);
+          if (m) return m[1];
+          return s;
+        }
+      }
+      return String(v);
+    };
 
-  const applicants = project.agentDetails || [];
+    return {
+      ...input,
+      _id: toIdString(input._id),
+      buyerId: toIdString(input.buyerId),
+      createdAt: input.createdAt ? new Date(input.createdAt).toISOString() : "",
+      updatedAt: input.updatedAt ? new Date(input.updatedAt).toISOString() : "",
+      // ensure applicants array is plain strings
+      applicants: Array.isArray(input.applicants)
+        ? input.applicants.map((a: any) => toIdString(a))
+        : [],
+      agentDetails: Array.isArray(input.agentDetails)
+        ? input.agentDetails.map((agent: any) => ({
+            ...agent,
+            _id: toIdString(agent._id),
+            createdAt: agent.createdAt
+              ? new Date(agent.createdAt).toISOString()
+              : "",
+            updatedAt: agent.updatedAt
+              ? new Date(agent.updatedAt).toISOString()
+              : "",
+          }))
+        : [],
+    } as ProjectWithApplicantsClient;
+  };
+
+  const projectData = serialize(raw);
 
   return (
-    <div className="p-6 lg:p-12">
-      <h1 className="text-2xl font-bold mb-4">
-        Applicants for: <span className="text-cyan-500">{project.title}</span>
-      </h1>
-
-      {applicants.length === 0 ? (
-        <p className="text-slate-500">No agents have applied yet.</p>
-      ) : (
-        <div className="grid gap-4">
-          {applicants.map((applicant: any) => (
-            <div
-              key={applicant._id.toString()}
-              className="p-4 bg-slate-900 rounded-lg border border-slate-800"
-            >
-              <div className="font-bold text-lg text-slate-200">
-                {applicant.name}
-              </div>
-              <div className="text-slate-400 text-sm">{applicant.email}</div>
-              {/* Add more applicant details here */}
-            </div>
-          ))}
-        </div>
-      )}
+    <div>
+      <ProjectApplicantsPage projectData={projectData} />
     </div>
   );
 }
