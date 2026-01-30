@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // app/projects/[project_id]/agents/page.tsx
 
-import ProjectApplicantsPage from "@/components/site/Buyer/AgentConfirmation/AgentDashboard";
 import { getProjectApplicants } from "@/services/projectService";
 import { ProjectWithApplicantsClient } from "@/components/Types/project.types";
+import ApplicantsPage from "@/components/site/Buyer/AgentConfirmation/ApplicantsPage";
 
 type PageProps = {
   params: {
@@ -69,9 +69,5 @@ export default async function AgentsPage({ params }: PageProps) {
 
   const projectData = serialize(raw);
 
-  return (
-    <div>
-      <ProjectApplicantsPage projectData={projectData} />
-    </div>
-  );
+  return <div>{projectData && <ApplicantsPage data={projectData} />}</div>;
 }
