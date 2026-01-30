@@ -20,7 +20,6 @@ export default async function AgentsPage({ params }: PageProps) {
   }
 
   const raw = await getProjectApplicants(project_id);
-  console.log("Project data fetched:", raw);
 
   // Serialize the result into plain JS (convert ObjectId/Date to strings)
   const serialize = (input: any): ProjectWithApplicantsClient | null => {

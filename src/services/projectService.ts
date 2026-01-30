@@ -17,10 +17,6 @@ export async function createNewProject(data: any) {
   return { ...project, _id: result.insertedId };
 }
 
-/**
- * Fetches all projects with optional filtering by status or role.
- * @param filter - MongoDB query object (e.g., { status: "OPEN" })
- */
 export async function getAllProjects(filter = {}) {
   try {
     const projectsCollection = dbConnect(collections.PROJECTS);
@@ -108,10 +104,6 @@ export async function getPaginatedMarketplace(page: number, limit: number) {
   };
 }
 
-/**
- * Requirement: View incoming requests from problem solvers [cite: 25]
- * This function joins project data with applicant user details.
- */
 export async function getProjectApplicants(projectId: string) {
   try {
     const projectCol = dbConnect(collections.PROJECTS);
@@ -157,6 +149,43 @@ export async function getProjectApplicants(projectId: string) {
     return result[0] || null;
   } catch (error) {
     console.error("Error fetching applicants:", error);
+    throw error;
+  }
+}
+
+/**
+ * Core Workflow: Assign one problem solver to a project
+ * State Transition: OPEN -> ASSIGNED [cite: 42, 59]
+ */
+export async function assignSolverToProject(
+  projectId: string,
+  solverId: string,
+) {
+  try {
+    const projectCol = dbConnect(collections.PROJECTS);
+
+    // Update the project document
+    const result = await projectCol.updateOne(
+      {
+        _id: new ObjectId(projectId),
+        status: "OPEN", // Safety: Only assign if currently unassigned [cite: 59]
+      },
+      {
+        $set: {
+          status: "ASSIGNED", // Transition project state [cite: 42]
+          assignedSolverId: solverId, // Assign the specific solver [cite: 26]
+          updatedAt: new Date(),
+        },
+      },
+    );
+
+    if (result.matchedCount === 0) {
+      throw new Error("Project not found or already assigned.");
+    }
+
+    return { success: true, message: "Mission Assigned Successfully" };
+  } catch (error) {
+    console.error("ASSIGNMENT_DB_ERROR:", error);
     throw error;
   }
 }

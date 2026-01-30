@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 // components/AgentCard.tsx
 import { motion } from "framer-motion";
 import { ShieldCheck, Cpu } from "lucide-react";

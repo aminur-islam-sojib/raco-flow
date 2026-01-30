@@ -131,7 +131,7 @@ export function ProjectCard({
         {project.status === "ASSIGNED" && (
           <Link
             href={`/buyer/projects/${project._id}/logs`}
-            className="flex-1 bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-400 border border-amber-500/20 font-bold text-xs h-9"
+            className="flex-1 flex justify-center items-center rounded-md bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-400 border border-amber-500/20 font-bold text-xs h-9"
           >
             <Zap className="w-3.5 h-3.5 mr-2" /> MISSION LOGS
           </Link>

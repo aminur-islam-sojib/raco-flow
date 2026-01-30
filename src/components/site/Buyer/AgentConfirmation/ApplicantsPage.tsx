@@ -18,9 +18,25 @@ export default function ApplicantsPage({
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  console.log(data);
+
   const handleAssignment = async () => {
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 2000));
+    try {
+      const res = await fetch("/api/projects/assign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: data?._id,
+          solverId: selectedAgent?._id,
+        }),
+      });
+      const json = await res.json();
+      console.log(json);
+      console.log(res);
+    } catch (err) {
+      console.error("assign error", err);
+    }
     setLoading(false);
     setSuccess(true);
     setTimeout(() => {
