@@ -1,3 +1,5 @@
+"use client";
+
 // components/mission/MissionHeader.tsx
 import { motion } from "framer-motion";
 

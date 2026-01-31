@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // components/mission/TaskCard.tsx
 import { motion } from "framer-motion";

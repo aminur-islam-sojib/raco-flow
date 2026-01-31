@@ -69,6 +69,7 @@ export const config = {
     /*
      * Match all request paths except for the ones starting with:
      * - api/auth (NextAuth endpoints)
+     * - api/uploadthing (UploadThing endpoints - needs public access for callbacks)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)

@@ -1,3 +1,5 @@
+"use client";
+
 // components/mission/BountyPanel.tsx
 import { Target, ShieldCheck, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";

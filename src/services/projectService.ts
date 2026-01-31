@@ -232,8 +232,10 @@ export async function getAdminGlobalStats() {
 }
 
 /**
- * Requirement: Problem Solver - Track project requests
- * Finds projects where the current user is an applicant.
+ * Requirement: Problem Solver - Track assigned projects
+ * Finds projects where:
+ * 1. Status is "ASSIGNED" (project has been assigned to this solver)
+ * 2. Current user ID is in the applicants array
  */
 export async function getMyProjectApplications() {
   const session = await getServerSession(authOptions);
@@ -244,9 +246,11 @@ export async function getMyProjectApplications() {
   try {
     const projectCol = dbConnect(collections.PROJECTS);
 
+    // Fetch only ASSIGNED projects where user is an applicant
     const missions = await projectCol
       .find({
-        applicants: { $in: [userId] },
+        status: "ASSIGNED", // ✅ Status validation
+        applicants: { $in: [userId] }, // ✅ User ID validation in applicants array
       })
       .sort({ createdAt: -1 })
       .toArray();
@@ -254,6 +258,6 @@ export async function getMyProjectApplications() {
     return missions;
   } catch (error) {
     console.error("MY_APPLICATIONS_DB_ERROR:", error);
-    throw new Error("Failed to retrieve your mission history.");
+    throw new Error("Failed to retrieve your assigned missions.");
   }
 }
