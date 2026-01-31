@@ -14,7 +14,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { useUsers } from "@/Hooks/useUsers";
 import { UserTableRow } from "./UsersTableRow";
-import Link from "next/link";
 
 export type UserRole = "admin" | "buyer" | "solver" | "user";
 

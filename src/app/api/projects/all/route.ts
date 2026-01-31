@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
@@ -15,7 +17,7 @@ export async function GET(req: Request) {
     const status = searchParams.get("status"); // Optional filter: ?status=OPEN
 
     // Build the query
-    let query: any = {};
+    const query: any = {};
     if (status) query.status = status;
     if (!session || !session.user || session.user.role !== "buyer") {
       return NextResponse.json(

@@ -3,8 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]/options";
 
 export default async function Home() {
-  const role = await getServerSession(authOptions);
-  console.log(role);
+  const user = await getServerSession(authOptions);
+  console.log(user);
   return (
     <>
       <HeroSection />

@@ -145,9 +145,8 @@ export const authOptions: NextAuthOptions = {
     // Add user role and ID to session
     async session({ session, token }: { session: Session; token: JWT }) {
       if (session.user) {
-        const user = session.user as Record<string, unknown>;
-        user.id = token.id;
-        user.role = token.role as UserRole;
+        session.user.id = token.id as string;
+        session.user.role = token.role as UserRole;
       }
       return session;
     },

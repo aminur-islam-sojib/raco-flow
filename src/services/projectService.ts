@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { collections, dbConnect } from "@/lib/dbConnects";
 import { ObjectId } from "mongodb";
+import { getServerSession } from "next-auth";
 
 export async function createNewProject(data: any) {
   const projectsCollection = dbConnect(collections.PROJECTS);
@@ -226,5 +228,32 @@ export async function getAdminGlobalStats() {
   } catch (error) {
     console.error("ADMIN_STATS_ERROR:", error);
     throw new Error("Failed to compute global intelligence.");
+  }
+}
+
+/**
+ * Requirement: Problem Solver - Track project requests
+ * Finds projects where the current user is an applicant.
+ */
+export async function getMyProjectApplications() {
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
+  if (!userId) {
+    return;
+  }
+  try {
+    const projectCol = dbConnect(collections.PROJECTS);
+
+    const missions = await projectCol
+      .find({
+        applicants: { $in: [userId] },
+      })
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    return missions;
+  } catch (error) {
+    console.error("MY_APPLICATIONS_DB_ERROR:", error);
+    throw new Error("Failed to retrieve your mission history.");
   }
 }
