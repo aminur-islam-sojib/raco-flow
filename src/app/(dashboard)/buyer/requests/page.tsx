@@ -1,3 +1,5 @@
+"use dynamic";
+
 import { NoSubmissions } from "@/components/site/Buyer/NoSubmissions";
 import { ProjectCard2 } from "@/components/site/Buyer/ProjectCard2";
 import { getBuyerSubmissions } from "@/services/buyerService";

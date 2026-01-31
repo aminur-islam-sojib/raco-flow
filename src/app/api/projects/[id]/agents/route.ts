@@ -6,7 +6,7 @@ import { validateProjectAccess } from "@/lib/projectAuth";
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,8 +16,11 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Step 2: Get project to validate ownership
-    const projectWithAgents = await getProjectApplicants(params.id);
+    // Step 2: Await params (Next.js 16+)
+    const { id } = await params;
+
+    // Step 3: Get project to validate ownership
+    const projectWithAgents = await getProjectApplicants(id);
 
     if (!projectWithAgents) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });

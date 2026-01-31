@@ -1,17 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import MissionOversight from "@/components/site/Admin/Projects/MissionOversight";
 import { getAllProjects } from "@/services/projectService";
 import type { Project, ProjectStatus } from "@/components/Types/project.types";
-
-type RawProject = {
-  _id?: { toString(): string } | string;
-  buyerId?: { toString(): string } | string;
-  deadline?: Date | string;
-  createdAt?: Date | string;
-  updatedAt?: Date | string;
-  applicants?: unknown[];
-  budget?: number | string;
-  [key: string]: unknown;
-};
 
 export default async function page() {
   const rawProjects = await getAllProjects();
@@ -31,7 +21,7 @@ export default async function page() {
   };
 
   // Serialize DB objects to plain JS values so they are safe to pass to Client components
-  const allProjects: Project[] = (rawProjects || []).map((p: RawProject) => ({
+  const allProjects: Project[] = (rawProjects || []).map((p: any) => ({
     _id: toIdString(p._id),
     title: p.title ? String(p.title) : "",
     description: p.description ? String(p.description) : "",
@@ -59,7 +49,7 @@ export default async function page() {
         : "OPEN";
     })(),
     applicants: Array.isArray(p.applicants)
-      ? p.applicants.map((a) => toIdString(a))
+      ? p.applicants.map((a: any) => toIdString(a))
       : [],
     createdAt: p.createdAt
       ? p.createdAt instanceof Date

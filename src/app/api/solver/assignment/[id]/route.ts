@@ -6,11 +6,11 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
-    const { id } = params;
+    const { id } = await params;
 
     // 1. Authenticate Session
     if (!session || !session.user) {
