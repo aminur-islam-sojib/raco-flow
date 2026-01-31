@@ -8,13 +8,13 @@ export function ThemeProvider({
   children,
   ...props
 }: React.ComponentProps<typeof NextThemesProvider>) {
-  // Use class attribute on html element for Tailwind dark mode
-  // storageKey tells next-themes where to persist theme preference
+  // Force dark mode only - no light mode
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="system"
-      enableSystem
+      defaultTheme="dark"
+      enableSystem={false}
+      forcedTheme="dark"
       storageKey="app-theme"
       {...props}
     >

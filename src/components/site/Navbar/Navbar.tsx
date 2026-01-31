@@ -13,7 +13,6 @@ import {
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserRole } from "@/lib/user.service";
-import { ThemeToggle } from "../Shared/ThemeToggle";
 import { UserMenu } from "../Shared/UserMenu";
 import { MobileMenu } from "./MobileMenu";
 import { NAV_CONFIG } from "@/config/nav.config";
@@ -38,7 +37,7 @@ export function Navbar() {
     >
       <motion.div
         style={{ opacity: navOpacity }}
-        className="absolute inset-0 bg-[var(--nav-bg-scroll)] rounded-full -z-10"
+        className="absolute inset-0 bg-(--nav-bg-scroll) rounded-full -z-10"
       />
       <div className="px-6 h-16 flex items-center justify-between pointer-events-auto relative z-10">
         {/* Logo with Shimmer */}
@@ -80,14 +79,16 @@ export function Navbar() {
               <Link href="/auth" className="text-sm font-medium">
                 Login
               </Link>
-              <Button className="relative group rounded-full bg-cyan-500 text-midnight font-bold overflow-hidden">
-                <span className="relative z-10">Get Started</span>
-                <motion.div
-                  animate={{ scale: [1, 1.5, 1], opacity: [0.1, 0.3, 0.1] }}
-                  transition={{ repeat: Infinity, duration: 2 }}
-                  className="absolute inset-0 bg-white"
-                />
-              </Button>
+              <Link href={"/solver/marketplace"}>
+                <Button className="relative group rounded-full bg-cyan-500 text-midnight font-bold overflow-hidden">
+                  <span className="relative z-10">Get Started</span>
+                  <motion.div
+                    animate={{ scale: [1, 1.5, 1], opacity: [0.1, 0.3, 0.1] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="absolute inset-0 bg-white"
+                  />
+                </Button>
+              </Link>
             </div>
           ) : (
             <UserMenu user={session?.user} role={role} />

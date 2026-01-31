@@ -2,6 +2,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { FeatureGrid } from "./FeatureGrid";
+import Link from "next/link";
 
 export function HeroSection() {
   const { scrollYProgress } = useScroll();
@@ -29,15 +30,19 @@ export function HeroSection() {
           workflows with precision.
         </p>
         <div className="flex gap-4 justify-center">
-          <Button
-            size="lg"
-            className="rounded-full px-8 shadow-[0_0_20px_rgba(34,211,238,0.3)]"
-          >
-            Get Started
-          </Button>
-          <Button size="lg" variant="outline" className="rounded-full px-8">
-            View Marketplace
-          </Button>
+          <Link href={"/auth"}>
+            <Button
+              size="lg"
+              className="rounded-full px-8 cursor-pointer shadow-[0_0_20px_rgba(34,211,238,0.3)]"
+            >
+              Get Started
+            </Button>
+          </Link>
+          <Link href={"/solver/marketplace"}>
+            <Button size="lg" variant="outline" className="rounded-full px-8">
+              View Marketplace
+            </Button>
+          </Link>
         </div>
       </motion.div>
 

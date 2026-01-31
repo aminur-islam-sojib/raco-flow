@@ -4,7 +4,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "../Shared/ThemeToggle";
 
 export function AuthNavbar() {
   return (
@@ -46,7 +45,6 @@ export function AuthNavbar() {
           className="flex items-center gap-3"
         >
           <div className="h-8 w-px bg-border mx-2 hidden sm:block" />
-          <ThemeToggle />
           <Link href="/help">
             <Button
               variant="outline"
