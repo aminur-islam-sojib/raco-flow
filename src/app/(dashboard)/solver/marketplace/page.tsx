@@ -2,8 +2,6 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { formatDistanceToNow } from "date-fns";
-import { Loader2, Timer } from "lucide-react";
 import { MissionCard } from "@/components/site/Solver/MissionCard";
 import { SkeletonGrid } from "@/components/site/Solver/SkeletonGrid";
 
@@ -14,6 +12,7 @@ interface Project {
   description: string;
   budget: number;
   deadline: string;
+  hasApplied?: boolean;
 }
 
 export default function SolverMarketplace() {
@@ -113,6 +112,7 @@ export default function SolverMarketplace() {
                   project={project}
                   onApply={handleApply}
                   isApplying={applyingId === project._id}
+                  hasApplied={project.hasApplied || false}
                 />
               ))}
             </motion.div>

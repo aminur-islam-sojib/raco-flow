@@ -2,12 +2,22 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { createNewProject } from "@/services/projectService";
+import { isBuyer } from "@/lib/projectAuth";
 
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || !session.user || session.user.role !== "buyer") {
+    // Step 1: Check authentication
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: "Unauthorized: No session found" },
+        { status: 401 },
+      );
+    }
+
+    // Step 2: Check role - only buyers can create projects
+    if (!isBuyer(session)) {
       return NextResponse.json(
         { error: "Only Buyers can post projects" },
         { status: 403 },
@@ -19,7 +29,7 @@ export async function POST(req: Request) {
 
     const { title, description, budget, deadline, category } = body;
 
-    // Validate required fields (budget can be 0, so check for null/undefined)
+    // Step 3: Validate data - Ensure all required fields are present
     if (
       !title ||
       !description ||
@@ -41,13 +51,14 @@ export async function POST(req: Request) {
       );
     }
 
+    // Step 4: Create project with validated data
     const project = await createNewProject({
       title,
       description,
       budget: parseFloat(budget),
       deadline: new Date(deadline),
       category,
-      buyerId: session.user.id,
+      buyerId: session.user.id, // Attach current user as buyer
     });
 
     return NextResponse.json({ success: true, data: project }, { status: 201 });

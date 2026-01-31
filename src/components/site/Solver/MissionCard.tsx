@@ -1,4 +1,4 @@
-import { Loader2, Timer } from "lucide-react";
+import { Loader2, Timer, Check } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 // --- Types & Interfaces ---
@@ -13,10 +13,12 @@ export function MissionCard({
   project,
   onApply,
   isApplying,
+  hasApplied,
 }: {
   project: Project;
   onApply: (id: string) => void;
   isApplying: boolean;
+  hasApplied: boolean;
 }) {
   return (
     <div className="group relative overflow-hidden rounded-sm border border-slate-800 bg-slate-900/40 backdrop-blur-xl p-4 md:p-6 transition-all hover:border-cyan-500/50 hover:shadow-[0_0_30px_-10px_rgba(6,182,212,0.2)]">
@@ -58,10 +60,14 @@ export function MissionCard({
 
       <button
         onClick={() => onApply(project._id)}
-        disabled={isApplying}
+        disabled={isApplying || hasApplied}
         className="w-full relative overflow-hidden bg-white text-black py-3 font-black text-xs uppercase tracking-[0.2em] hover:bg-cyan-500 hover:text-white transition-all disabled:bg-slate-800 disabled:text-slate-500"
       >
-        {isApplying ? (
+        {hasApplied ? (
+          <span className="flex items-center justify-center gap-2">
+            <Check size={16} /> ALREADY APPLIED
+          </span>
+        ) : isApplying ? (
           <span className="flex items-center justify-center gap-2">
             <Loader2 className="animate-spin" size={16} /> PENDING
           </span>

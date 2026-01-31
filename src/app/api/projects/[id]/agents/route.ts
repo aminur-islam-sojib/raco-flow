@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getProjectApplicants } from "@/services/projectService";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+import { validateProjectAccess } from "@/lib/projectAuth";
 
 export async function GET(
   req: Request,
@@ -9,28 +10,34 @@ export async function GET(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    // Step 1: Check authentication
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Step 2: Get project to validate ownership
     const projectWithAgents = await getProjectApplicants(params.id);
 
     if (!projectWithAgents) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
-    if (!session || !session.user || session.user.role !== "buyer") {
+
+    // Step 3: Validate project ownership - only buyer who owns it or admin can access
+    const accessValidation = validateProjectAccess(
+      session,
+      projectWithAgents.buyerId,
+      "buyer",
+    );
+
+    if (!accessValidation.authorized) {
       return NextResponse.json(
-        { error: "Only Buyers can view projects" },
-        { status: 403 },
+        { error: accessValidation.error },
+        { status: accessValidation.statusCode || 403 },
       );
     }
-    // Security: Only the Buyer who created this can see the applicants
-    if (
-      projectWithAgents.buyerId !== session.user.id &&
-      session.user.role !== "admin"
-    ) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
 
+    // Step 4: Return validated data
     return NextResponse.json({
       success: true,
       data: projectWithAgents,

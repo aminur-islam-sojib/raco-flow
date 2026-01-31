@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import ProjectList, { Project } from "@/components/site/Buyer/ProjectList";
 import { getAllProjects } from "@/services/projectService";
 import { getServerSession } from "next-auth";
@@ -12,27 +11,35 @@ export default async function BuyerPage() {
     redirect("/auth/signin");
   }
 
-  // Optional: Check role if needed
-  if (session.user.role !== "buyer") {
+  const userId = session.user.id;
+  const userRole = session.user.role;
+
+  // Step 1: Check role
+  if (userRole !== "buyer" && userRole !== "admin") {
     redirect("/auth/signin");
   }
 
+  // Step 2: Fetch all projects
   const rawProjects = await getAllProjects({});
 
-  // Serialize _id and other potential non-serializable fields
-  // We strictly cast here because we know the shape from the DB (mostly)
-  // and we want to satisfy the component prop type.
-  const projects = rawProjects.map((p: any) => ({
+  // Step 3: Validate data - Filter projects based on user role
+  // Admins can see all projects, buyers see only their own
+  const filteredProjects = rawProjects.filter((p) => {
+    if (userRole === "admin") {
+      return true; // Admins can see all projects
+    }
+    // Buyers can only see their own projects
+    const buyerId =
+      typeof p.buyerId === "string" ? p.buyerId : p.buyerId?.toString();
+    return buyerId === userId;
+  });
+
+  // Step 4: Serialize and return data
+  const projects = filteredProjects.map((p) => ({
     ...p,
     _id: p._id.toString(),
     deadline: new Date(p.deadline).toISOString(),
   })) as Project[];
-  console.log(projects);
-  // Filter for RBAC if needed (e.g. show only my projects? The request was "fetch all projects", assuming marketplace view or buyer's own projects.
-  // Context: "Buyer Dashboard". Usually buyers see their1 own projects.
-  // But `getAllProjects({})` fetches everything. The mock data had "OPEN" and "ASSIGNED".
-  // The user said "fetch all projects data from here and pass...".
-  // I will pass all for now as requested.
 
   return (
     <div>
