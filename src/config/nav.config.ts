@@ -19,7 +19,6 @@ export const NAV_CONFIG: Record<Role, NavItem[]> = {
   ],
   solver: [
     { label: "Marketplace", href: "/solver/marketplace" },
-    { label: "My Assignments", href: "/solver/projects" },
     { label: "Active Tasks", href: "/solver/tasks" },
     { label: "Earnings", href: "/solver/earnings" },
   ],

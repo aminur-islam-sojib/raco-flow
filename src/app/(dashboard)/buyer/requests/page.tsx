@@ -1,3 +1,4 @@
+import { NoSubmissions } from "@/components/site/Buyer/NoSubmissions";
 import { ProjectCard2 } from "@/components/site/Buyer/ProjectCard2";
 import { getBuyerSubmissions } from "@/services/buyerService";
 
@@ -13,7 +14,7 @@ export default async function page() {
             <ProjectCard2 project={project} index={index} key={index} />
           ))
         ) : (
-          <div>No submissions found</div>
+          <NoSubmissions />
         )}
       </div>
     );

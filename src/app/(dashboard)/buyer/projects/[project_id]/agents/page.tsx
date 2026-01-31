@@ -63,7 +63,7 @@ export default async function AgentsPage({ params }: PageProps) {
   const buyerIdString =
     typeof raw.buyerId === "string"
       ? raw.buyerId
-      : raw.buyerId?.toString?.() || String(raw.buyerId);
+      : raw.buyerId || String(raw.buyerId);
 
   if (userRole !== "admin" && buyerIdString !== userId) {
     // User is not authorized to view this project
@@ -132,7 +132,7 @@ export default async function AgentsPage({ params }: PageProps) {
   };
 
   // Step 4: Show data after validation
-  const projectData = serialize(raw);
+  const projectData = serialize(raw as unknown as RawProjectInput);
 
   return <div>{projectData && <ApplicantsPage data={projectData} />}</div>;
 }
