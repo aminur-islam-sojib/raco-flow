@@ -9,9 +9,8 @@ export type NavItem = {
 export const NAV_CONFIG: Record<Role, NavItem[]> = {
   admin: [
     { label: "Overview", href: "/admin" },
-    { label: "User Management", href: "/admin/users" }, // For promoting to Buyer
+    { label: "User Management", href: "/admin/users" },
     { label: "All Projects", href: "/admin/projects" },
-    { label: "System Logs", href: "/admin/logs" },
   ],
   buyer: [
     { label: "My Projects", href: "/buyer" },

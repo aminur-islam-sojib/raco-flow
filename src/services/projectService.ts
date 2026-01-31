@@ -189,3 +189,42 @@ export async function assignSolverToProject(
     throw error;
   }
 }
+
+export async function getAdminGlobalStats() {
+  try {
+    const projectCol = dbConnect(collections.PROJECTS);
+
+    const stats = await projectCol
+      .aggregate([
+        {
+          $group: {
+            _id: null,
+            totalProjects: { $sum: 1 },
+            totalMarketVolume: { $sum: "$budget" },
+            // Counts projects where an agent has been assigned [cite: 42]
+            totalAssignedMissions: {
+              $sum: { $cond: [{ $eq: ["$status", "ASSIGNED"] }, 1, 0] },
+            },
+            // Optional: Count currently open bounties [cite: 39]
+            totalOpenMissions: {
+              $sum: { $cond: [{ $eq: ["$status", "OPEN"] }, 1, 0] },
+            },
+          },
+        },
+      ])
+      .toArray();
+
+    // Default values if no projects exist yet
+    return (
+      stats[0] || {
+        totalProjects: 0,
+        totalMarketVolume: 0,
+        totalAssignedMissions: 0,
+        totalOpenMissions: 0,
+      }
+    );
+  } catch (error) {
+    console.error("ADMIN_STATS_ERROR:", error);
+    throw new Error("Failed to compute global intelligence.");
+  }
+}

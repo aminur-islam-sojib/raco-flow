@@ -55,25 +55,14 @@ export default function AdminUsersPage() {
   return (
     // Uses 'bg-background' and 'text-foreground' for shadcn theme compatibility
     <div className="min-h-screen bg-background text-foreground p-4 md:p-8 selection:bg-primary/30 transition-colors duration-300">
-      {/* Breadcrumbs - Using muted-foreground for secondary text */}
-      <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-8 font-mono">
-        <Link
-          href="/admin"
-          className="hover:text-primary transition-colors cursor-pointer uppercase tracking-tight"
-        >
-          Admin
-        </Link>
-        <span>/</span>
-        <span className="text-foreground/80">User Governance</span>
-      </nav>
-
       {/* Header Section */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
         <div>
-          <h1 className="text-4xl font-bold tracking-tighter bg-linear-to-br from-foreground to-foreground/50 bg-clip-text text-transparent">
-            User Directory
+          <h1 className="text-4xl font-black tracking-tighter uppercase italic">
+            User <span className="text-cyan-500">Directory</span>
           </h1>
-          <p className="text-muted-foreground mt-1 text-balance">
+
+          <p className="text-slate-500 font-mono text-sm mt-1">
             Monitor and elevate user privileges across the RacoFlow ecosystem.
           </p>
         </div>
