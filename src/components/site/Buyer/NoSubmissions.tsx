@@ -8,7 +8,7 @@ export const NoSubmissions = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex flex-col items-center justify-center min-h-100 w-full border-2 border-dashed border-slate-800 rounded-3xl bg-slate-900/10 p-12 text-center"
+      className="flex flex-col items-center justify-center min-h-screen w-full border-2 border-dashed border-slate-800 rounded-3xl bg-slate-900/10 p-12 text-center"
     >
       {/* Animated Radar/Scanner Icon */}
       <div className="relative mb-6">

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+import { VoidScanner } from "@/components/site/Shared/VoidScanner";
 import MissionSelectionHub from "@/components/site/Solver/Task/Assignments";
 import { getMyProjectApplications } from "@/services/projectService";
 import { getServerSession } from "next-auth";
@@ -48,6 +49,10 @@ export default async function MissionPage() {
     : myAssignment
       ? sanitizeDoc(myAssignment)
       : [];
+
+  if (sanitizedAssignments.length < 1) {
+    return <VoidScanner />;
+  }
 
   return (
     <div>

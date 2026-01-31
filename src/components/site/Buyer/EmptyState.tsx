@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { LayoutDashboard } from "lucide-react";
+import Link from "next/link";
 
 export function EmptyState() {
   return (
@@ -17,9 +18,11 @@ export function EmptyState() {
         Your tactical dashboard is empty. Initiate your first project to begin
         the flow.
       </p>
-      <Button className="bg-cyan-600 hover:bg-cyan-500 text-white px-8 h-12 rounded-xl font-bold">
-        START FIRST MISSION
-      </Button>
+      <Link href={"/buyer/create"}>
+        <Button className="bg-cyan-600 cursor-pointer hover:bg-cyan-500 text-white px-8 h-12 rounded-xl font-bold">
+          START FIRST MISSION
+        </Button>
+      </Link>
     </motion.div>
   );
 }

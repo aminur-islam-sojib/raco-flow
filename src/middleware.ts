@@ -40,7 +40,12 @@ const middleware = withAuth(
 
     // 3. API PROTECTION (Critical for Security)
     // ---------------------------------------------------------
-    if (path.startsWith("/api/admin") && userRole !== "admin") {
+    // Solvers can promote themselves - don't block /api/admin/promote
+    if (
+      path.startsWith("/api/admin") &&
+      path !== "/api/admin/promote" &&
+      userRole !== "admin"
+    ) {
       return NextResponse.json(
         { error: "Unauthorized access" },
         { status: 403 },
