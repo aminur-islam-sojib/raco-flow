@@ -3,6 +3,45 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { collections, dbConnect } from "@/lib/dbConnects";
 import { ObjectId } from "mongodb";
 import { getServerSession } from "next-auth";
+import { Project } from "@/components/Types/project.types";
+
+function sanitizeProject(doc: any): Project {
+  if (!doc) return doc;
+  return {
+    ...doc,
+    _id: doc._id?.toString ? doc._id.toString() : String(doc._id),
+    title: doc.title,
+    description: doc.description,
+    budget:
+      typeof doc.budget === "number" ? doc.budget : Number(doc.budget || 0),
+    deadline: doc.deadline
+      ? doc.deadline.toISOString
+        ? doc.deadline.toISOString()
+        : String(doc.deadline)
+      : "",
+    category: doc.category || "",
+    buyerId: doc.buyerId?.toString
+      ? doc.buyerId.toString()
+      : String(doc.buyerId || ""),
+    assignedSolverId: doc.assignedSolverId?.toString
+      ? doc.assignedSolverId.toString()
+      : doc.assignedSolverId,
+    status: doc.status,
+    applicants: Array.isArray(doc.applicants)
+      ? doc.applicants.map((a: any) => (a?.toString ? a.toString() : String(a)))
+      : [],
+    createdAt: doc.createdAt
+      ? doc.createdAt.toISOString
+        ? doc.createdAt.toISOString()
+        : String(doc.createdAt)
+      : new Date().toISOString(),
+    updatedAt: doc.updatedAt
+      ? doc.updatedAt.toISOString
+        ? doc.updatedAt.toISOString()
+        : String(doc.updatedAt)
+      : new Date().toISOString(),
+  } as Project;
+}
 
 export async function createNewProject(data: any) {
   const projectsCollection = dbConnect(collections.PROJECTS);
@@ -24,12 +63,12 @@ export async function getAllProjects(filter = {}) {
     const projectsCollection = dbConnect(collections.PROJECTS);
 
     // Fetching projects, converting the cursor to an array
-    const projects = await projectsCollection
+    const projectsRaw = await projectsCollection
       .find(filter)
       .sort({ createdAt: -1 }) // Newest projects first
       .toArray();
 
-    return projects;
+    return projectsRaw.map(sanitizeProject);
   } catch (error) {
     console.error("DATABASE_ERROR_FETCH_PROJECTS:", error);
     throw new Error("Failed to fetch projects from database");
@@ -69,7 +108,7 @@ export async function getMarketplaceProjects() {
 
   // Fetch projects that are OPEN
   // We use .project() to only send what the Solver needs to see
-  return await projectsCollection
+  const projectsRaw = await projectsCollection
     .find({ status: "OPEN" })
     .project({
       title: 1,
@@ -82,6 +121,8 @@ export async function getMarketplaceProjects() {
     })
     .sort({ createdAt: -1 })
     .toArray();
+
+  return projectsRaw.map(sanitizeProject);
 }
 
 export async function getPaginatedMarketplace(page: number, limit: number) {
@@ -89,7 +130,7 @@ export async function getPaginatedMarketplace(page: number, limit: number) {
   const skip = (page - 1) * limit;
 
   // Run two queries in parallel for better performance
-  const [projects, total] = await Promise.all([
+  const [projectsRaw, total] = await Promise.all([
     projectsCollection
       .find({ status: "OPEN" })
       .sort({ createdAt: -1 })
@@ -100,7 +141,7 @@ export async function getPaginatedMarketplace(page: number, limit: number) {
   ]);
 
   return {
-    projects,
+    projects: projectsRaw.map(sanitizeProject),
     totalPages: Math.ceil(total / limit),
     totalCount: total,
   };
@@ -148,7 +189,7 @@ export async function getProjectApplicants(projectId: string) {
     ];
 
     const result = await projectCol.aggregate(pipeline).toArray();
-    return result[0] || null;
+    return result[0] ? sanitizeProject(result[0]) : null;
   } catch (error) {
     console.error("Error fetching applicants:", error);
     throw error;
@@ -247,7 +288,7 @@ export async function getMyProjectApplications() {
     const projectCol = dbConnect(collections.PROJECTS);
 
     // Fetch only ASSIGNED projects where user is an applicant
-    const missions = await projectCol
+    const missionsRaw = await projectCol
       .find({
         status: "ASSIGNED", // ✅ Status validation
         applicants: { $in: [userId] }, // ✅ User ID validation in applicants array
@@ -255,7 +296,7 @@ export async function getMyProjectApplications() {
       .sort({ createdAt: -1 })
       .toArray();
 
-    return missions;
+    return missionsRaw.map(sanitizeProject);
   } catch (error) {
     console.error("MY_APPLICATIONS_DB_ERROR:", error);
     throw new Error("Failed to retrieve your assigned missions.");

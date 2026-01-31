@@ -3,7 +3,7 @@ export type Role = "admin" | "buyer" | "solver" | "user" | "guest";
 export type NavItem = {
   label: string;
   href: string;
-  description?: string; // Helpful for tooltips or mobile menus
+  description?: string;
 };
 
 export const NAV_CONFIG: Record<Role, NavItem[]> = {
@@ -16,7 +16,6 @@ export const NAV_CONFIG: Record<Role, NavItem[]> = {
     { label: "My Projects", href: "/buyer" },
     { label: "Create Project", href: "/buyer/create" },
     { label: "Solver Requests", href: "/buyer/requests" },
-    { label: "Submissions", href: "/buyer/submissions" },
   ],
   solver: [
     { label: "Marketplace", href: "/solver/marketplace" },
@@ -26,7 +25,7 @@ export const NAV_CONFIG: Record<Role, NavItem[]> = {
   ],
   user: [
     { label: "Home", href: "/" },
-    { label: "Become a Buyer", href: "/apply-buyer" }, // Promotion request page
+    { label: "Become a Buyer", href: "/apply-buyer" },
     { label: "Profile", href: "/profile" },
   ],
   guest: [

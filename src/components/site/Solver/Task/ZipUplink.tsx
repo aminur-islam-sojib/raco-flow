@@ -3,8 +3,7 @@ import { UploadDropzone } from "@/lib/uploadthing";
 import { toast } from "react-hot-toast";
 
 async function saveUrlToTask(taskId: string, fileUrl: string) {
-  console.log("taskid", taskId);
-  console.log("fileUrl", fileUrl);
+  console.log("📤 Submitting task:", { taskId, fileUrl });
   try {
     const response = await fetch("/api/task/submit", {
       method: "PATCH",
@@ -12,17 +11,20 @@ async function saveUrlToTask(taskId: string, fileUrl: string) {
       body: JSON.stringify({ taskId, submissionUrl: fileUrl }),
     });
 
+    console.log("Response status:", response.status);
+    const data = await response.json();
+    console.log("Response data:", data);
+
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to save submission");
+      throw new Error(data.error || "Failed to save submission");
     }
 
-    const data = await response.json();
     toast.success(data.message || "Package Deployed Successfully");
     return data;
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error occurred";
+    console.error("❌ Deployment error:", errorMessage);
     toast.error(`Deployment Failed: ${errorMessage}`);
     throw error;
   }
@@ -30,7 +32,7 @@ async function saveUrlToTask(taskId: string, fileUrl: string) {
 
 export function ZipUplink({ taskId }: { taskId: string }) {
   return (
-    <div className="p-4 bg-slate-900/40 border border-slate-800 rounded-xl">
+    <div className="bg-slate-900/40 border border-slate-800 rounded-xl">
       <UploadDropzone
         endpoint="zipUploader"
         input={{}}

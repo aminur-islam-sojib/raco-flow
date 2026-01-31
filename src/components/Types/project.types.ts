@@ -34,4 +34,4 @@ export interface ProjectWithApplicantsClient extends Project {
   agentDetails: AgentDetail[];
 }
 
-export type ProjectStatus = "OPEN" | "ASSIGNED" | "COMPLETED";
+export type ProjectStatus = "OPEN" | "ASSIGNED" | "COMPLETED" | "SUBMITTED";

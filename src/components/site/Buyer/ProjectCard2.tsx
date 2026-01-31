@@ -1,3 +1,5 @@
+"use client";
+
 import { Project } from "./ProjectList";
 import { motion } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
@@ -17,13 +19,12 @@ import {
   MoreVertical,
   RefreshCw,
   Settings,
-  TrendingUp,
   Users,
   Zap,
 } from "lucide-react";
 import Link from "next/link";
 
-export function ProjectCard({
+export function ProjectCard2({
   project,
   index,
 }: {
@@ -42,6 +43,48 @@ export function ProjectCard({
   });
 
   console.log(project);
+
+  const confirmUplink = async (taskId: string) => {
+    if (!taskId) {
+      console.error("❌ No taskId provided");
+      return;
+    }
+    try {
+      console.log("📤 Confirming uplink for taskId:", taskId);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/task/confirm`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ taskId }),
+        },
+      );
+
+      console.log("Response status:", res.status);
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`API error: ${res.status} ${errorText}`);
+      }
+
+      const result = await res.json();
+      console.log("✅ Confirmation result:", result);
+
+      // Optional: Trigger a refresh or toast notification here
+      if (result.success) {
+        console.log("✅ Project status updated to CONFIRMED");
+        // Could add: window.location.reload() or call a refresh function
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Unknown error";
+      console.error("❌ Confirm uplink error:", msg);
+    }
+  };
+
+  const handleConfirmUplink = (taskId: string) => {
+    console.log("click", taskId);
+    confirmUplink(taskId);
+  };
 
   return (
     <motion.div
@@ -171,6 +214,7 @@ export function ProjectCard({
 
         {project.status === "SUBMITTED" && (
           <Button
+            onClick={() => handleConfirmUplink(project?._id)}
             className="flex-1 flex justify-center items-center gap-2 rounded-md 
                bg-indigo-500/10 hover:bg-indigo-500/20 
                text-indigo-400 border border-indigo-500/40 
@@ -205,14 +249,6 @@ export function ProjectCard({
             </motion.div>
           </Button>
         )}
-
-        <Button
-          variant="outline"
-          size="icon"
-          className="h-9 w-9 border-slate-800 hover:bg-slate-800"
-        >
-          <TrendingUp className="w-3.5 h-3.5 text-slate-400" />
-        </Button>
       </div>
     </motion.div>
   );

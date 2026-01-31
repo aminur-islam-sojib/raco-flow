@@ -31,14 +31,24 @@ export default function ApplicantsPage({
           solverId: selectedAgent?._id,
         }),
       });
+
+      // Check if response is OK before parsing JSON
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Response error:", res.status, errorText);
+        throw new Error(`API error: ${res.status} ${res.statusText}`);
+      }
+
       const json = await res.json();
       console.log(json);
       console.log(res);
+      setSuccess(true);
     } catch (err) {
       console.error("assign error", err);
+      setSuccess(false);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-    setSuccess(true);
     setTimeout(() => {
       setSelectedAgent(null);
       setSuccess(false);

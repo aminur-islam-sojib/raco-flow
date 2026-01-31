@@ -1,21 +1,21 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import { submitTaskWork } from "@/services/taskService";
+import { confirmTaskWork } from "@/services/taskService";
 
 export async function PATCH(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || session?.user?.role !== "solver") {
+    if (!session || session?.user?.role !== "buyer") {
       return NextResponse.json(
-        { error: "Unauthorized: Only solvers can submit" },
+        { error: "Unauthorized: Only buyers can confirm" },
         { status: 401 },
       );
     }
 
-    const { taskId, submissionUrl } = await req.json();
+    const { taskId } = await req.json();
 
-    if (!taskId || !submissionUrl) {
+    if (!taskId) {
       return NextResponse.json(
         { error: "Missing required fields: taskId and submissionUrl" },
         { status: 400 },
@@ -30,7 +30,7 @@ export async function PATCH(req: Request) {
       );
     }
 
-    await submitTaskWork(taskId, userId, submissionUrl);
+    await confirmTaskWork(taskId, userId);
 
     return NextResponse.json({
       success: true,

@@ -11,6 +11,12 @@ export function useUsers() {
     try {
       setLoading(true);
       const res = await fetch("/api/users");
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Failed to fetch users: ${res.status} ${errorText}`);
+      }
+
       const data = await res.json();
 
       if (data.success) {
@@ -19,7 +25,12 @@ export function useUsers() {
         setError(data.error || "Failed to fetch users");
       }
     } catch (err) {
-      setError("An error occurred while fetching users");
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "An error occurred while fetching users";
+      setError(msg);
+      console.error("fetchUsers error:", msg);
     } finally {
       setLoading(false);
     }
@@ -33,6 +44,11 @@ export function useUsers() {
         body: JSON.stringify({ userId: id }),
       });
 
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`API error: ${res.status} ${errorText}`);
+      }
+
       const data = await res.json();
 
       if (data.success) {
@@ -43,11 +59,11 @@ export function useUsers() {
           ),
         );
       } else {
-        // Handle error (could extend this to return error or show toast)
-        console.error(data.error);
+        console.error("Promotion failed:", data.error);
       }
     } catch (err) {
-      console.error("Failed to promote user", err);
+      const msg = err instanceof Error ? err.message : "Failed to promote user";
+      console.error("Failed to promote user:", msg);
     }
   };
 

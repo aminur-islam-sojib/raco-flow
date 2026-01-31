@@ -29,8 +29,7 @@ export default async function BuyerPage() {
       return true; // Admins can see all projects
     }
     // Buyers can only see their own projects
-    const buyerId =
-      typeof p.buyerId === "string" ? p.buyerId : p.buyerId?.toString();
+    const buyerId = typeof p.buyerId === "string" ? p.buyerId : p.buyerId;
     return buyerId === userId;
   });
 

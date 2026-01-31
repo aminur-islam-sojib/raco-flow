@@ -2,18 +2,19 @@ import { dbConnect, collections } from "@/lib/dbConnects";
 import { ObjectId } from "mongodb";
 
 export async function submitTaskWork(
-  taskId: string,
+  projectId: string,
   solverId: string,
   fileUrl: string,
 ) {
-  const taskCollection = dbConnect(collections.SUBTASKS);
+  const projectCollection = dbConnect(collections.PROJECTS);
 
   // Requirement: Role-aware data flow
-  // Ensure the solver only updates a task assigned to them
-  const result = await taskCollection.updateOne(
+  // Ensure the solver only updates a project assigned to them
+  const result = await projectCollection.updateOne(
     {
-      _id: new ObjectId(taskId),
-      solverId: solverId,
+      _id: new ObjectId(projectId),
+      assignedSolverId: solverId,
+      status: "ASSIGNED",
     },
     {
       $set: {
@@ -25,7 +26,34 @@ export async function submitTaskWork(
   );
 
   if (result.matchedCount === 0) {
-    throw new Error("Task not found or unauthorized.");
+    throw new Error(
+      "Project not found or unauthorized. Make sure the project is assigned to you.",
+    );
+  }
+
+  return { success: true };
+}
+export async function confirmTaskWork(projectId: string, buyerId: string) {
+  const projectCollection = dbConnect(collections.PROJECTS);
+
+  const result = await projectCollection.updateOne(
+    {
+      _id: new ObjectId(projectId),
+      buyerId: buyerId,
+      status: "SUBMITTED",
+    },
+    {
+      $set: {
+        status: "CONFIRMED",
+        submittedAt: new Date(),
+      },
+    },
+  );
+
+  if (result.matchedCount === 0) {
+    throw new Error(
+      "Project not found or unauthorized. Make sure the project is assigned to you.",
+    );
   }
 
   return { success: true };
