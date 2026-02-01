@@ -5,7 +5,11 @@ import { Navbar } from "@/components/site/Navbar/Navbar";
 
 export function NavbarWrapper() {
   const pathname = usePathname();
-  const isAuthPage = pathname.startsWith("/auth");
+  const isAuthPage =
+    pathname.startsWith("/auth") ||
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname.startsWith("/auth/");
 
   if (isAuthPage) {
     return null;

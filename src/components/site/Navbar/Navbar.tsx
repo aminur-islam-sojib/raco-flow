@@ -76,10 +76,10 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           {status === "unauthenticated" ? (
             <div className="hidden md:flex items-center gap-4">
-              <Link href="/auth" className="text-sm font-medium">
+              <Link href="/login" className="text-sm font-medium">
                 Login
               </Link>
-              <Link href={"/solver/marketplace"}>
+              <Link href={"/register"}>
                 <Button className="relative group rounded-full bg-cyan-500 text-midnight font-bold overflow-hidden">
                   <span className="relative z-10">Get Started</span>
                   <motion.div

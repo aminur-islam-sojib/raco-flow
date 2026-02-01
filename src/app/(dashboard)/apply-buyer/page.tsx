@@ -7,7 +7,7 @@ export const page = async () => {
   const session = await getServerSession(authOptions);
   const role = session?.user?.role;
   if (!role) {
-    redirect("/auth");
+    redirect("/login");
   }
 
   return (

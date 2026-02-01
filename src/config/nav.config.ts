@@ -25,7 +25,6 @@ export const NAV_CONFIG: Record<Role, NavItem[]> = {
   user: [
     { label: "Home", href: "/" },
     { label: "Become a Buyer", href: "/apply-buyer" },
-    { label: "Profile", href: "/profile" },
   ],
   guest: [
     { label: "Home", href: "/" },

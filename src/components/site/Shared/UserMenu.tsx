@@ -43,6 +43,7 @@ export function UserMenu({ user, role }: { user: any; role: string }) {
       >
         <DropdownMenuLabel className="flex flex-col">
           <span>{user?.name}</span>
+          <span className="text-xs text-gray-500">{user?.email}</span>
           <Badge
             variant="outline"
             className="w-fit mt-1 text-[10px] uppercase tracking-widest text-cyan-500 border-cyan-500/30"

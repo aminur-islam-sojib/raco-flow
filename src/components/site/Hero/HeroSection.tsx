@@ -30,7 +30,7 @@ export function HeroSection() {
           workflows with precision.
         </p>
         <div className="flex gap-4 justify-center">
-          <Link href={"/auth"}>
+          <Link href={"/register"}>
             <Button
               size="lg"
               className="rounded-full px-8 cursor-pointer shadow-[0_0_20px_rgba(34,211,238,0.3)]"
@@ -38,7 +38,7 @@ export function HeroSection() {
               Get Started
             </Button>
           </Link>
-          <Link href={"/solver/marketplace"}>
+          <Link href={"/register"}>
             <Button size="lg" variant="outline" className="rounded-full px-8">
               View Marketplace
             </Button>
