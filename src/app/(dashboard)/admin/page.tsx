@@ -1,12 +1,11 @@
 // components/admin/CommandCenter.tsx
 "use client";
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ShieldCheck,
   Zap,
   ShoppingBag,
-  Activity,
   Users,
   CheckCircle2,
   Globe,
